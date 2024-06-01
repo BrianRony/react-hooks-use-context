@@ -1,11 +1,6 @@
 # React Context
 
-## Learning Goals
-
-- Understand the use cases for React Context and what problems it solves
-- Use `createContext` and the `useContext` hook to work with Context
-
-## Introduction
+## Overview
 
 So far, we've learned that there is only one way to share data across multiple
 components: some parent component is responsible for passing down that data to
@@ -50,10 +45,10 @@ In addition, because of the requirement that we must pass down data from parent
 to child components, we have a couple of components that take in some data via
 props, only to pass it along to a child component. For example, looking at the
 `Profile` component, we can see that it takes in a `theme` prop, even though it
-doesn't use it directly — it only needs to take this prop in so that it can pass
-it down to the `Interests` component:
+doesn't use it directly -- it only needs to take this prop in so that it can
+pass it down to the `Interests` component:
 
-```jsx
+```js
 // takes theme as a prop
 function Profile({ user, theme }) {
   if (!user) return <h2>Please Login To View Profile</h2>;
@@ -67,9 +62,6 @@ function Profile({ user, theme }) {
 }
 ```
 
-This is known as **prop-drilling**, and it can become a burden for deeply-nested
-component hierarchies.
-
 Let's see how to use React Context to solve this problem.
 
 ## Creating Context
@@ -82,20 +74,20 @@ In order to create our context data, we need to create two things:
 Let's start by creating the context for our `user` data. To organize our context
 code, make a new file called `/src/context/user.js`. Then, create our context:
 
-```jsx
+```js
 // src/context/user.js
-import React from 'react';
+import React from "react";
 
 const UserContext = React.createContext();
 ```
 
 After creating the context object, we need a special "provider" component that
-will give access to the context data to its child components. Here's how we can
-set up the context provider:
+will give access to the context data to its child components. Here's how we can set
+up the context provider:
 
-```jsx
+```js
 // src/context/user.js
-import React from 'react';
+import React from "react";
 
 // create the context
 const UserContext = React.createContext();
@@ -112,10 +104,6 @@ export { UserContext, UserProvider };
 
 With our context created, and our provider component all set up, let's see how
 we can use this context data from other components.
-
-Curious about what children are? Review our
-[React Children Lesson](https://github.com/learn-co-curriculum/react-hooks-children)
-for a refresher!
 
 ## Using Context
 
@@ -135,15 +123,15 @@ App [theme]
 
 So let's update the `App` component with the `UserProvider`:
 
-```jsx
-import React, { useState } from 'react';
-import Header from './Header';
-import Profile from './Profile';
+```js
+import React, { useState } from "react";
+import Header from "./Header";
+import Profile from "./Profile";
 // import the provider
-import { UserProvider } from '../context/user';
+import { UserProvider } from "../context/user";
 
 function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   return (
     <main className={theme}>
       {/* wrap components that need access to context data in the provider*/}
@@ -161,20 +149,17 @@ export default App;
 You'll notice we also removed the `user` prop from these components, since we'll
 be accessing that data via context instead.
 
-We've also included our `Header` and `Profile` components as children of our
-UserProvider.
-
 Next, in order to access the context data from our components, we can use the
 `useContext` hook. This is another hook that's built into React, and it lets us
 access the `value` of our context provider in any child component. Here's how it
-looks when used in our Profile component:
+looks:
 
-```jsx
+```js
 // import the useContext hook
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 // import the UserContext we created
-import { UserContext } from '../context/user';
-import Interests from './Interests';
+import { UserContext } from "../context/user";
+import Interests from "./Interests";
 
 function Profile({ theme }) {
   // call useContext with our UserContext
@@ -196,11 +181,11 @@ You can test this out by updating the `value` prop in our `UserProvider` to
 something different, and see that the `Profile` component has access to the
 updated data:
 
-```jsx
+```js
 function UserProvider({ children }) {
   const currentUser = {
-    name: 'Duane',
-    interests: ['Coding', 'Biking', "Words ending in 'ing'"],
+    name: "Duane",
+    interests: ["Coding", "Biking", "Words ending in 'ing'"],
   };
   return (
     <UserContext.Provider value={currentUser}>{children}</UserContext.Provider>
@@ -210,12 +195,12 @@ function UserProvider({ children }) {
 
 Let's hook up the `Header` component to our context as well:
 
-```jsx
-import React, { useContext } from 'react';
-import ThemedButton from './ThemedButton';
-import DarkModeToggle from './DarkModeToggle';
-import defaultUser from '../data';
-import { UserContext } from '../context/user';
+```js
+import React, { useContext } from "react";
+import ThemedButton from "./ThemedButton";
+import DarkModeToggle from "./DarkModeToggle";
+import defaultUser from "../data";
+import { UserContext } from "../context/user";
 
 function Header({ theme, setTheme }) {
   const user = useContext(UserContext);
@@ -233,7 +218,7 @@ function Header({ theme, setTheme }) {
       <h1>React Context</h1>
       <nav>
         <ThemedButton onClick={handleLogin} theme={theme}>
-          {user ? 'Logout' : 'Login'}
+          {user ? "Logout" : "Login"}
         </ThemedButton>
         <DarkModeToggle theme={theme} setTheme={setTheme} />
       </nav>
@@ -247,9 +232,9 @@ logging in/logging out a user. In the first version of our app, that
 functionality was available to use in the `App` component since we had a `user`
 variable as **state**:
 
-```jsx
+```js
 function App() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   const [user, setUser] = useState(null);
   return (
     <main className={theme}>
@@ -261,9 +246,9 @@ function App() {
 ```
 
 We can re-gain this functionality by setting up the **context** value to be
-stateful instead! (Remember to import `useState`!)
+stateful instead!
 
-```jsx
+```js
 function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   return (
@@ -287,7 +272,7 @@ well as a setter function. In the `Provider`, we're now using an **object** with
 After this update, we can now use the `setUser` function in our `Header`
 component:
 
-```jsx
+```js
 function Header({ theme, setTheme }) {
   const { user, setUser } = useContext(UserContext);
   function handleLogin() {
@@ -304,7 +289,7 @@ function Header({ theme, setTheme }) {
 We'll also need to update the `Profile` component since our context value has
 changed:
 
-```jsx
+```js
 function Profile({ theme }) {
   const { user } = useContext(UserContext);
   // ...
@@ -328,9 +313,8 @@ drilling". However, React recommends using context sparingly:
 > components at different nesting levels. Apply it sparingly because it makes
 > component reuse more difficult.
 >
-> If you only want to avoid passing some props through many levels, component
-> composition is often a simpler solution than context. —
-> [Before You Use Context](https://reactjs.org/docs/context.html#before-you-use-context)
+> If you only want to avoid passing some props through many levels, component composition is often a simpler solution than context.
+> &mdash; [Before You Use Context](https://reactjs.org/docs/context.html#before-you-use-context)
 
 Keep this in mind when you're considering adding context to your application.
 Think about whether or not the data that's being held in context is truly
